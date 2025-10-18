@@ -1,7 +1,7 @@
 // src/components/ListSkeleton.tsx
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { radii, spacing } from '../tokens';
+import { radii, spacing } from '../constants/tokens';
 
 export default function ListSkeleton() {
   return (
