@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, fontSizes, radii, spacing } from '../tokens';
+import { colors, fontSizes, radii, spacing } from '../constants/tokens';
 import { formatCurrency } from '../utils/format';
 
 type Props = {
