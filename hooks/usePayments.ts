@@ -1,6 +1,6 @@
 
+import { Payment, loadMockPayments } from '@/services/payments';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Payment, loadMockPayments } from '../services/payments';
 
 export function usePayments() {
   const [payments, setPayments] = useState<Payment[]>([]);
