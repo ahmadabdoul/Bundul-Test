@@ -1,4 +1,4 @@
-// src/tokens.ts
+
 export const spacing = {
     xs: 4,
     s: 8,
