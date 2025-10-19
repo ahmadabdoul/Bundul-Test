@@ -11,6 +11,7 @@ import PayModal from '@/components/PayModal';
 import { colors } from '@/constants/tokens';
 import { usePayments } from '@/hooks/usePayments';
 import { FlashList } from '@shopify/flash-list';
+import { StatusBar } from 'expo-status-bar';
 
 export default function DuePaymentsScreen() {
   const { payments, loading, refreshing, onRefresh, totalDue, payNow, payLater } = usePayments();
@@ -36,10 +37,10 @@ export default function DuePaymentsScreen() {
     setTimeout(() => setToast(null), 2400);
   };
 
-  const ITEM_HEIGHT = 110; // fixed item height for FlashList (match PaymentItem card)
+ 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* LinearGradient as full-screen background (vertical) */}
+    <StatusBar backgroundColor={colors.gradientStart} style='dark' />
       <LinearGradient
         colors={[colors.gradientStart, colors.gradientEnd]}
         start={[0, 0]}
