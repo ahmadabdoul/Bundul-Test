@@ -1,15 +1,15 @@
-import { Stack } from 'expo-router';
-import React from 'react';
+import { Stack } from "expo-router";
+import React from "react";
 
-import Colors from '@/constants/Colors';
+import Colors from "@/constants/Colors";
 
 export default function StackLayout() {
-  const colorScheme = 'light'; // Default to 'light' theme
+  const colorScheme = "light";
 
   return (
     <Stack
       screenOptions={{
-        headerShown: false, // Removed useClientOnlyValue
+        headerShown: false,
         headerStyle: {
           backgroundColor: Colors[colorScheme].background,
         },
@@ -19,7 +19,7 @@ export default function StackLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Due Payments',
+          title: "Due Payments",
           headerShown: false,
         }}
       />
