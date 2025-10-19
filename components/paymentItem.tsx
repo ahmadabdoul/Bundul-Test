@@ -1,10 +1,23 @@
-import { colors, elevation, fontSizes, radii, spacing } from '@/constants/tokens';
-import { Payment } from '@/services/payments';
-import { formatDueDate, getDaysUntilDue, isDueSoon } from '@/utils/date';
-import { formatCurrency } from '@/utils/format';
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  colors,
+  elevation,
+  fontSizes,
+  radii,
+  spacing,
+} from "@/constants/tokens";
+import { Payment } from "@/services/payments";
+import { formatDueDate, getDaysUntilDue, isDueSoon } from "@/utils/date";
+import { formatCurrency } from "@/utils/format";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useMemo, useRef } from "react";
+import {
+  Animated,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type Props = {
   item: Payment;
@@ -12,33 +25,28 @@ type Props = {
   onPayLater: (id: number) => void;
 };
 
-// Helper function to determine colors based on urgency
 const getUrgencyColors = (daysLeft: number) => {
-  // Most urgent: today or past due
   if (daysLeft <= 0) {
     return {
-      gradient: ['#FFEBEB', '#FFF5F5'],
-      border: '#FCA5A5',
+      gradient: ["#FFEBEB", "#FFF5F5"],
+      border: "#FCA5A5",
     };
   }
-  // Very urgent: 1 day left
   if (daysLeft === 1) {
     return {
-      gradient: ['#FEEFEF', '#FFF8F8'],
-      border: '#FECACA',
+      gradient: ["#FEEFEF", "#FFF8F8"],
+      border: "#FECACA",
     };
   }
-  // Urgent: 2-3 days left
   if (daysLeft <= 3) {
     return {
-      gradient: ['#FFF2F0', '#FFFCFC'],
-      border: '#FEE2E2',
+      gradient: ["#FFF2F0", "#FFFCFC"],
+      border: "#FEE2E2",
     };
   }
-  // Default for non-urgent items (though this won't be used if `dueSoon` is false)
   return {
-    gradient: ['#FFFFFF', '#FFFFFF'],
-    border: 'transparent',
+    gradient: ["#FFFFFF", "#FFFFFF"],
+    border: "transparent",
   };
 };
 
@@ -46,10 +54,9 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
   const dueSoon = isDueSoon(item.dueDate);
   const pulse = useRef(new Animated.Value(1)).current;
 
-  // Calculate urgency level and memoize the colors to prevent recalculation on re-renders
   const urgency = useMemo(() => {
     if (!dueSoon) return null;
-    const daysLeft = getDaysUntilDue(item.dueDate);
+    const daysLeft = getDaysUntilDue(item.dueDate as any);
     return getUrgencyColors(daysLeft);
   }, [dueSoon, item.dueDate]);
 
@@ -57,8 +64,16 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
     if (dueSoon) {
       Animated.loop(
         Animated.sequence([
-          Animated.timing(pulse, { toValue: 1.05, duration: 800, useNativeDriver: true }),
-          Animated.timing(pulse, { toValue: 1.0, duration: 800, useNativeDriver: true }),
+          Animated.timing(pulse, {
+            toValue: 1.05,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulse, {
+            toValue: 1.0,
+            duration: 800,
+            useNativeDriver: true,
+          }),
         ])
       ).start();
     } else {
@@ -73,28 +88,38 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
       colors={dueSoon && urgency ? urgency.gradient : undefined}
       start={{ x: 0, y: 0.5 }}
       end={{ x: 1, y: 0.5 }}
-      style={[styles.card, dueSoon && urgency && { borderColor: urgency.border, ...styles.cardUrgent }]}>
+      style={[
+        styles.card,
+        dueSoon &&
+          urgency && { borderColor: urgency.border, ...styles.cardUrgent },
+      ]}
+    >
       <Image source={item.icon} style={styles.icon} />
 
       <View style={styles.detailsColumn}>
         <Text style={styles.service}>{item.service}</Text>
         <Text style={styles.date}>{formatDueDate(item.dueDate)}</Text>
         {dueSoon && (
-          <Animated.View style={[styles.badge, { transform: [{ scale: pulse }] }]}>
+          <Animated.View
+            style={[styles.badge, { transform: [{ scale: pulse }] }]}
+          >
             <Text style={styles.badgeText}>Due Soon</Text>
           </Animated.View>
         )}
       </View>
 
       <View style={styles.actionsColumn}>
-        <Text style={styles.amount}>{formatCurrency(item.amount, item.currency)}</Text>
+        <Text style={styles.amount}>
+          {formatCurrency(item.amount, item.currency)}
+        </Text>
         <View style={styles.buttonGroup}>
           <TouchableOpacity
             accessible
             accessibilityRole="button"
             accessibilityLabel={`Pay ${item.service} now`}
             style={styles.primaryButton}
-            onPress={() => onPayNow(item.id)}>
+            onPress={() => onPayNow(item.id)}
+          >
             <Text style={styles.primaryButtonText}>Pay Now</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -102,7 +127,8 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
             accessibilityRole="button"
             accessibilityLabel={`Pay ${item.service} later`}
             style={styles.secondaryButton}
-            onPress={() => onPayLater(item.id)}>
+            onPress={() => onPayLater(item.id)}
+          >
             <Text style={styles.secondaryButtonText}>Pay Later</Text>
           </TouchableOpacity>
         </View>
@@ -118,14 +144,13 @@ const styles = StyleSheet.create({
     padding: spacing.m,
     marginHorizontal: spacing.m,
     marginVertical: spacing.s,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     ...elevation.low,
   },
   cardUrgent: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
-    
   },
   icon: {
     width: 48,
@@ -135,13 +160,13 @@ const styles = StyleSheet.create({
   },
   detailsColumn: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     gap: spacing.xs,
   },
   service: {
     fontSize: fontSizes.body,
     color: colors.textPrimary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   date: {
     fontSize: fontSizes.caption,
@@ -152,43 +177,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radii.pill,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginTop: spacing.s,
   },
   badgeText: {
     color: colors.primaryTextOn,
     fontSize: fontSizes.small,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   actionsColumn: {
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
+    alignItems: "flex-end",
+    justifyContent: "space-between",
     minHeight: 70,
   },
   amount: {
     fontSize: fontSizes.amount,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.textPrimary,
     marginBottom: spacing.m,
   },
   buttonGroup: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
+    flexDirection: "column",
+    alignItems: "flex-end",
     gap: spacing.s,
   },
   primaryButton: {
     backgroundColor: colors.primary,
-    borderRadius: radii.m,
+    borderRadius: radii.small,
     paddingVertical: spacing.s,
     paddingHorizontal: spacing.m,
     minHeight: 44,
     minWidth: 90,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   primaryButtonText: {
     color: colors.primaryTextOn,
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: fontSizes.body,
   },
   secondaryButton: {
@@ -197,6 +222,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: colors.primary,
     fontSize: fontSizes.small,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
