@@ -25,18 +25,20 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
         ])
       ).start();
     } else {
-      pulse.setValue(1); 
+      // Reset animation value if the component re-renders for a non-urgent item
+      pulse.setValue(1);
     }
   }, [dueSoon, pulse]);
 
+  // Conditionally use LinearGradient for the card's container if it's due soon
   const CardContainer = dueSoon ? LinearGradient : View;
 
   return (
     <CardContainer
-      // Apply gradient colors only if the container is LinearGradient
-      colors={dueSoon ? ['#FFF2F0', '#FFFFFF'] : undefined}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+      // These props are only used by LinearGradient
+      colors={dueSoon ? ['#FFF2F0', '#FFFCFC'] : undefined}
+      start={{ x: 0, y: 0.5 }}
+      end={{ x: 1, y: 0.5 }}
       style={[styles.card, dueSoon && styles.cardUrgent]}>
       <Image source={item.icon} style={styles.icon} />
 
@@ -89,19 +91,20 @@ const styles = StyleSheet.create({
     ...elevation.low,
   },
   cardUrgent: {
-    
     backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
   },
   icon: {
     width: 48,
     height: 48,
-    borderRadius: 12, 
+    borderRadius: 12,
     marginRight: spacing.m,
   },
   detailsColumn: {
-    flex: 1, 
+    flex: 1,
     justifyContent: 'center',
-    gap: spacing.xs, 
+    gap: spacing.xs,
   },
   service: {
     fontSize: fontSizes.body,
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radii.pill,
-    alignSelf: 'flex-start', 
+    alignSelf: 'flex-start',
     marginTop: spacing.s,
   },
   badgeText: {
@@ -128,7 +131,7 @@ const styles = StyleSheet.create({
   actionsColumn: {
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    minHeight: 70, 
+    minHeight: 70,
   },
   amount: {
     fontSize: fontSizes.amount,
@@ -146,7 +149,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.m,
     paddingVertical: spacing.s,
     paddingHorizontal: spacing.m,
-    minHeight: 44, 
+    minHeight: 44,
     minWidth: 90,
     alignItems: 'center',
     justifyContent: 'center',
