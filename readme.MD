@@ -13,6 +13,8 @@ To run this project locally, you will need to have Node.js and the Expo CLI inst
     git clone <repository-url>
     cd <repository-directory>
     ```
+**Or Download and extract the zip folder of the project**
+
 
 2.  **Install dependencies:**
     ```bash
