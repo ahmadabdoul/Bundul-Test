@@ -1,9 +1,9 @@
 import { colors, elevation, fontSizes, radii, spacing } from '@/constants/tokens';
 import { Payment } from '@/services/payments';
-import { formatDueDate, isDueSoon } from '@/utils/date';
+import { formatDueDate, getDaysUntilDue, isDueSoon } from '@/utils/date';
 import { formatCurrency } from '@/utils/format';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
@@ -12,9 +12,46 @@ type Props = {
   onPayLater: (id: number) => void;
 };
 
+// Helper function to determine colors based on urgency
+const getUrgencyColors = (daysLeft: number) => {
+  // Most urgent: today or past due
+  if (daysLeft <= 0) {
+    return {
+      gradient: ['#FFEBEB', '#FFF5F5'],
+      border: '#FCA5A5',
+    };
+  }
+  // Very urgent: 1 day left
+  if (daysLeft === 1) {
+    return {
+      gradient: ['#FEEFEF', '#FFF8F8'],
+      border: '#FECACA',
+    };
+  }
+  // Urgent: 2-3 days left
+  if (daysLeft <= 3) {
+    return {
+      gradient: ['#FFF2F0', '#FFFCFC'],
+      border: '#FEE2E2',
+    };
+  }
+  // Default for non-urgent items (though this won't be used if `dueSoon` is false)
+  return {
+    gradient: ['#FFFFFF', '#FFFFFF'],
+    border: 'transparent',
+  };
+};
+
 export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
   const dueSoon = isDueSoon(item.dueDate);
   const pulse = useRef(new Animated.Value(1)).current;
+
+  // Calculate urgency level and memoize the colors to prevent recalculation on re-renders
+  const urgency = useMemo(() => {
+    if (!dueSoon) return null;
+    const daysLeft = getDaysUntilDue(item.dueDate);
+    return getUrgencyColors(daysLeft);
+  }, [dueSoon, item.dueDate]);
 
   useEffect(() => {
     if (dueSoon) {
@@ -25,24 +62,20 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
         ])
       ).start();
     } else {
-      // Reset animation value if the component re-renders for a non-urgent item
       pulse.setValue(1);
     }
   }, [dueSoon, pulse]);
 
-  // Conditionally use LinearGradient for the card's container if it's due soon
   const CardContainer = dueSoon ? LinearGradient : View;
 
   return (
     <CardContainer
-      // These props are only used by LinearGradient
-      colors={dueSoon ? ['#FFF2F0', '#FFFCFC'] : undefined}
+      colors={dueSoon && urgency ? urgency.gradient : undefined}
       start={{ x: 0, y: 0.5 }}
       end={{ x: 1, y: 0.5 }}
-      style={[styles.card, dueSoon && styles.cardUrgent]}>
+      style={[styles.card, dueSoon && urgency && { borderColor: urgency.border, ...styles.cardUrgent }]}>
       <Image source={item.icon} style={styles.icon} />
 
-      {/* Details column (flexible width) */}
       <View style={styles.detailsColumn}>
         <Text style={styles.service}>{item.service}</Text>
         <Text style={styles.date}>{formatDueDate(item.dueDate)}</Text>
@@ -53,7 +86,6 @@ export default function PaymentItem({ item, onPayNow, onPayLater }: Props) {
         )}
       </View>
 
-      {/* Actions column (fixed width) */}
       <View style={styles.actionsColumn}>
         <Text style={styles.amount}>{formatCurrency(item.amount, item.currency)}</Text>
         <View style={styles.buttonGroup}>
@@ -93,7 +125,7 @@ const styles = StyleSheet.create({
   cardUrgent: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#FEE2E2',
+    
   },
   icon: {
     width: 48,

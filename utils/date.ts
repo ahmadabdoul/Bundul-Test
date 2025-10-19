@@ -22,3 +22,15 @@ export function isDueSoon(iso: string) {
 export function isPastDue(iso: string) {
   return daysUntil(iso) < 0;
 }
+
+export const getDaysUntilDue = (dueDate: Date): number => {
+    const today = new Date();
+    // Normalize dates to midnight to compare days accurately
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    due.setHours(0, 0, 0, 0);
+  
+    const diffTime = due.getTime() - today.getTime();
+    // Calculate the number of full days
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
